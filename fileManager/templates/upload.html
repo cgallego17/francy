@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Subir Fotos y Videos</title>
+    <style>
+        body {
+            background-color: #fdf5e6; /* Color crema suave */
+            font-family: 'Georgia', serif;
+        }
+        .upload-container {
+            max-width: 500px;
+            margin: 30px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            border: 2px solid #f7d9c4;
+        }
+        .upload-title {
+            font-family: 'Cursive', serif;
+            color: #d88a6f;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .upload-instructions {
+            font-size: 1rem;
+            color: #6b4f4f;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .upload-step {
+            margin-bottom: 10px;
+        }
+        .custom-file {
+            margin-bottom: 15px;
+        }
+        .custom-file-label {
+            background-color: #fff8f3;
+            border: 1px solid #f7d9c4;
+            color: #6b4f4f;
+            border-radius: 5px;
+        }
+        .custom-file-label::after {
+            background-color: #d88a6f;
+            color: white;
+            border-radius: 0 5px 5px 0;
+        }
+        .btn-upload {
+            width: 100%;
+            background-color: #d88a6f;
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+            padding: 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .btn-upload:hover {
+            background-color: #c6765e;
+        }
+        .file-preview {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+        .file-item {
+            position: relative;
+            width: 100px;
+            text-align: center;
+        }
+        .file-thumbnail {
+            width: 100px;
+            height: 100px;
+            border-radius: 10px;
+            object-fit: cover;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .file-name {
+            font-size: 0.85rem;
+            color: #6b4f4f;
+            margin-top: 5px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .remove-btn {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #d9534f;
+            color: white;
+            border: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .remove-btn:hover {
+            background: #c9302c;
+        }
+        .reminder-message {
+            font-size: 0.9rem;
+            color: #d88a6f;
+            font-weight: bold;
+            margin-top: 10px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="upload-container">
+        <h1 class="upload-title">Memorias de la Boda</h1>
+        <p class="upload-instructions">
+            Ayúdanos a guardar los recuerdos de este día tan especial.<br> Sube aquí las <strong>fotos</strong> y <strong>videos</strong> de la boda de
+            <strong>Francy Arboleda</strong> y <strong>Elkin Ocampo</strong>. 
+            <br>
+            <br>
+            <strong>Pasos a seguir:</strong><br>
+            
+            <strong>Paso 1:</strong> Haz clic en el botón **"Selecciona tus archivos"** y elige las fotos y videos desde tu dispositivo. <br> 
+            <strong>Paso 2:</strong> Haz clic en el botón **"Subir Archivos"** para guardar tus recuerdos.  
+        </p>
+        
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="file" class="font-weight-bold">Seleccionar archivo(s):</label>
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="file" name="file" multiple>
+                    <label class="custom-file-label" for="file">PASO 1. Selecciona tus archivos</label>
+                </div>
+            </div>
+            <div class="file-preview" id="file-preview">
+                <!-- Aquí se mostrarán las miniaturas -->
+            </div>
+            <div class="reminder-message">
+                Recuerda hacer el **Paso 2** después de seleccionar los archivos para asegurarte de que se suban correctamente. 😊
+            </div>
+            <button type="submit" class="btn btn-upload">PASO 2. Subir Archivos</button>
+            <p>Gracias por compartir estos recuerdos tan especiales ❤️</p><br>  
+            <a href="{% url 'media_list' %}" class="btn btn-primary font-weight-bold" style="transition: transform 0.3s ease-in-out;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">Ver fotos</a>
+        </form>
+
+        <!-- Mostrar mensajes -->
+        {% if messages %}
+            <div class="alert alert-success" role="alert">
+                {% for message in messages %}
+                    {{ message }}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const fileInput = document.querySelector('.custom-file-input');
+        const previewContainer = document.getElementById('file-preview');
+
+        fileInput.addEventListener('change', (event) => {
+            const files = Array.from(event.target.files);
+            previewContainer.innerHTML = ''; // Limpia las miniaturas previas
+
+            files.forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.classList.add('file-item');
+                fileItem.dataset.index = index;
+
+                const fileThumbnail = document.createElement('img');
+                fileThumbnail.classList.add('file-thumbnail');
+
+                const fileName = document.createElement('div');
+                fileName.classList.add('file-name');
+                fileName.textContent = file.name;
+
+                const removeBtn = document.createElement('button');
+                removeBtn.classList.add('remove-btn');
+                removeBtn.innerHTML = '&times;';
+                removeBtn.onclick = () => {
+                    files.splice(index, 1);
+                    renderPreview(files);
+                };
+
+                // Verifica si es una imagen
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        fileThumbnail.src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    // Si no es imagen, usa un ícono genérico
+                    fileThumbnail.src = 'https://via.placeholder.com/100?text=Video';
+                }
+
+                fileItem.appendChild(fileThumbnail);
+                fileItem.appendChild(removeBtn);
+                fileItem.appendChild(fileName);
+                previewContainer.appendChild(fileItem);
+            });
+        });
+
+        function renderPreview(files) {
+            previewContainer.innerHTML = '';
+            files.forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.classList.add('file-item');
+                fileItem.dataset.index = index;
+
+                const fileThumbnail = document.createElement('img');
+                fileThumbnail.classList.add('file-thumbnail');
+
+                const fileName = document.createElement('div');
+                fileName.classList.add('file-name');
+                fileName.textContent = file.name;
+
+                const removeBtn = document.createElement('button');
+                removeBtn.classList.add('remove-btn');
+                removeBtn.innerHTML = '&times;';
+                removeBtn.onclick = () => {
+                    files.splice(index, 1);
+                    renderPreview(files);
+                };
+
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        fileThumbnail.src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    fileThumbnail.src = 'https://via.placeholder.com/100?text=Video';
+                }
+
+                fileItem.appendChild(fileThumbnail);
+                fileItem.appendChild(removeBtn);
+                fileItem.appendChild(fileName);
+                previewContainer.appendChild(fileItem);
+            });
+        }
+    </script>
+</body>
+</html>
